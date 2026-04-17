@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useContext, useCallback } from "react";
 import { Canvas as FabricCanvas, FabricImage, Textbox } from "fabric";
 import axios from "../api/axios";
+import { API_ENDPOINTS, withId } from "../api/endpoints";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
@@ -56,7 +57,7 @@ function Templates() {
 
   const fetchTemplates = async () => {
     try {
-      const res = await axios.get("/templates");
+      const res = await axios.get(API_ENDPOINTS.TEMPLATES);
       setTemplates(res.data);
     } catch (err) {
       console.error("Failed to fetch templates:", err);
@@ -65,7 +66,7 @@ function Templates() {
 
   const fetchDepartments = async () => {
     try {
-      const res = await axios.get("/templates/departments");
+      const res = await axios.get(API_ENDPOINTS.TEMPLATE_DEPARTMENTS);
       setDepartments(res.data || []);
     } catch (err) {
       console.error("Failed to fetch departments:", err);
@@ -128,7 +129,7 @@ function Templates() {
     try {
       const formData = new FormData();
       formData.append("file", imageFile);
-      const res = await axios.post("/templates/upload-image", formData, {
+      const res = await axios.post(API_ENDPOINTS.TEMPLATE_UPLOAD_IMAGE, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       setBackgroundUrl(res.data.imageUrl);
@@ -262,10 +263,10 @@ function Templates() {
 
     try {
       if (editingId) {
-        await axios.put(`/templates/${editingId}`, payload);
+        await axios.put(withId(API_ENDPOINTS.TEMPLATES, editingId), payload);
         alert("Template updated ✅");
       } else {
-        await axios.post("/templates", payload);
+        await axios.post(API_ENDPOINTS.TEMPLATES, payload);
         alert("Template created ✅");
       }
 
@@ -341,7 +342,7 @@ function Templates() {
   const deleteTemplate = async (id) => {
     if (!confirm("Are you sure you want to delete this template?")) return;
     try {
-      await axios.delete(`/templates/${id}`);
+      await axios.delete(withId(API_ENDPOINTS.TEMPLATES, id));
       fetchTemplates();
       if (editingId === id) resetEditor();
     } catch (err) {

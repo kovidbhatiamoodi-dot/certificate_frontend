@@ -1,5 +1,6 @@
 import { useEffect, useState, useContext } from "react";
 import axios from "../api/axios";
+import { API_ENDPOINTS, withId } from "../api/endpoints";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
@@ -24,7 +25,7 @@ function Batches() {
   const fetchBatches = async () => {
     try {
       setLoading(true);
-      const res = await axios.get("/batches");
+      const res = await axios.get(API_ENDPOINTS.BATCHES);
       setBatches(res.data);
     } catch (err) {
       console.error("Failed to fetch batches:", err);
@@ -41,7 +42,7 @@ function Batches() {
     }
 
     try {
-      const res = await axios.get(`/batches/${batchId}`);
+      const res = await axios.get(withId(API_ENDPOINTS.BATCHES, batchId));
       setExpandedBatch(batchId);
       setBatchEntries(res.data.entries || []);
     } catch (err) {
@@ -51,7 +52,7 @@ function Batches() {
 
   const handlePreview = async (batchId) => {
     try {
-      const res = await axios.get(`/certificates/preview/${batchId}`);
+      const res = await axios.get(withId(API_ENDPOINTS.CERTIFICATES_PREVIEW, batchId));
       setPreviewData(res.data);
     } catch (err) {
       alert("Preview failed");
@@ -63,7 +64,7 @@ function Batches() {
 
     setReleasing(batchId);
     try {
-      const res = await axios.post(`/certificates/release/${batchId}`);
+      const res = await axios.post(withId(API_ENDPOINTS.CERTIFICATES_RELEASE, batchId));
       alert(`${res.data.message}\n${res.data.successCount}/${res.data.total} certificates generated`);
       fetchBatches();
     } catch (err) {
@@ -75,7 +76,7 @@ function Batches() {
 
   const handleDownloadCertificate = async (entryId, miNo) => {
     try {
-      const res = await axios.get(`/certificates/download/${entryId}`, {
+      const res = await axios.get(withId(API_ENDPOINTS.CERTIFICATES_DOWNLOAD, entryId), {
         responseType: "blob",
       });
 
@@ -96,7 +97,7 @@ function Batches() {
   const handleDelete = async (batchId) => {
     if (!confirm("Delete this batch? This action cannot be undone.")) return;
     try {
-      await axios.delete(`/batches/${batchId}`);
+      await axios.delete(withId(API_ENDPOINTS.BATCHES, batchId));
       fetchBatches();
       if (expandedBatch === batchId) {
         setExpandedBatch(null);

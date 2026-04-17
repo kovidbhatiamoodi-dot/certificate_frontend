@@ -1,6 +1,7 @@
 import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "../api/axios";
+import { API_ENDPOINTS } from "../api/endpoints";
 import { AuthContext } from "../context/AuthContext";
 
 function IdentityMapping() {
@@ -26,7 +27,7 @@ function IdentityMapping() {
       const formData = new FormData();
       formData.append("file", file);
 
-      const res = await axios.post("/identity-mapping/upload", formData, {
+      const res = await axios.post(API_ENDPOINTS.IDENTITY_MAPPING_UPLOAD, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },

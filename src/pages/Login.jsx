@@ -1,6 +1,7 @@
 import { useContext, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
 import axios from "../api/axios";
+import { API_ENDPOINTS } from "../api/endpoints";
 import { useNavigate, Navigate } from "react-router-dom";
 
 function Login() {
@@ -23,7 +24,7 @@ function Login() {
     setLoading(true);
 
     try {
-      const res = await axios.post("/auth/login", { email, password });
+      const res = await axios.post(API_ENDPOINTS.AUTH_LOGIN, { email, password });
       login(res.data.token, res.data.admin);
       navigate("/dashboard");
     } catch (err) {

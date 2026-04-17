@@ -1,5 +1,6 @@
 import { useEffect, useState, useContext } from "react";
 import axios from "../api/axios";
+import { API_ENDPOINTS } from "../api/endpoints";
 import { AuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
@@ -22,7 +23,7 @@ function CreateBatch() {
 
   const fetchTemplates = async () => {
     try {
-      const res = await axios.get("/templates");
+      const res = await axios.get(API_ENDPOINTS.TEMPLATES);
       setTemplates(res.data);
     } catch (err) {
       console.error("Failed to fetch templates:", err);
@@ -31,7 +32,7 @@ function CreateBatch() {
 
   const fetchDepartments = async () => {
     try {
-      const res = await axios.get("/templates/departments");
+      const res = await axios.get(API_ENDPOINTS.TEMPLATE_DEPARTMENTS);
       setDepartments(res.data || []);
     } catch (err) {
       console.error("Failed to fetch departments:", err);
@@ -124,7 +125,7 @@ function CreateBatch() {
         formData.append("department_id", selectedDepartmentId);
       }
 
-      const res = await axios.post("/batches", formData, {
+      const res = await axios.post(API_ENDPOINTS.BATCHES, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
