@@ -162,8 +162,8 @@ function Templates() {
       fontSize: 24,
       fill: "#000000",
       fontFamily: "Rubik",
-      originX: "left",
-      originY: "top",
+      originX: "center",
+      originY: "center",
       editable: false,
       hasControls: true,
       hasBorders: true,
@@ -223,16 +223,22 @@ function Templates() {
     const canvas = fabricRef.current;
     if (!canvas) return [];
 
-    return canvas.getObjects().map((obj) => ({
-      key: obj.data?.key || "field",
-      x: Number((obj.left || 0).toFixed(2)),
-      y: Number((obj.top || 0).toFixed(2)),
-      originX: obj.originX || "left",
-      originY: obj.originY || "top",
-      fontSize: obj.fontSize || 24,
-      fontColor: obj.fill || "#000000",
-      fontFamily: "Rubik",
-    }));
+    return canvas.getObjects().map((obj) => {
+      const centerPoint = typeof obj.getCenterPoint === "function"
+        ? obj.getCenterPoint()
+        : { x: obj.left || 0, y: obj.top || 0 };
+
+      return {
+        key: obj.data?.key || "field",
+        x: Number((centerPoint.x || 0).toFixed(2)),
+        y: Number((centerPoint.y || 0).toFixed(2)),
+        originX: "center",
+        originY: "center",
+        fontSize: obj.fontSize || 24,
+        fontColor: obj.fill || "#000000",
+        fontFamily: "Rubik",
+      };
+    });
   };
 
   // ─── Save template ───
