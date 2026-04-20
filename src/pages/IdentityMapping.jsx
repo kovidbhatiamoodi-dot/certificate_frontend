@@ -13,6 +13,48 @@ function IdentityMapping() {
   const [result, setResult] = useState(null);
   const [error, setError] = useState("");
 
+  const escapeCsvValue = (value) => {
+    const text = String(value ?? "");
+    if (/[,"\n\r]/.test(text)) {
+      return `"${text.replaceAll('"', '""')}"`;
+    }
+    return text;
+  };
+
+  const downloadSkippedRowsCsv = () => {
+    if (!result?.skippedRows?.length) {
+      return;
+    }
+
+    const rows = result.skippedRows;
+    const headers = ["rowNumber", "reason", "email", "mi_no", "row_json"];
+    const csvLines = [
+      headers.join(","),
+      ...rows.map((item) => {
+        const rowJson = JSON.stringify(item.row || {});
+        return [
+          item.rowNumber,
+          item.reason,
+          item.row?.email || "",
+          item.row?.mi_no || "",
+          rowJson,
+        ]
+          .map(escapeCsvValue)
+          .join(",");
+      }),
+    ];
+
+    const blob = new Blob([csvLines.join("\n")], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = `skipped-identity-rows-${new Date().toISOString().slice(0, 19).replaceAll(":", "-")}.csv`;
+    document.body.appendChild(anchor);
+    anchor.click();
+    document.body.removeChild(anchor);
+    URL.revokeObjectURL(url);
+  };
+
   const handleUpload = async () => {
     setError("");
     setResult(null);
@@ -101,8 +143,45 @@ function IdentityMapping() {
           )}
 
           {result && (
-            <div className="mt-4 bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 px-4 py-3 rounded-lg text-sm">
-              {result.message} Total mappings: {result.total}
+            <div className="mt-4 space-y-4 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-300">
+              <div>
+                <div className="font-medium">{result.message}</div>
+                <div className="mt-1 text-emerald-200/80">
+                  Total mappings saved: {result.total}
+                  {typeof result.skippedCount === "number" ? ` · Skipped rows: ${result.skippedCount}` : ""}
+                </div>
+              </div>
+
+              {Array.isArray(result.skippedRows) && result.skippedRows.length > 0 && (
+                <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-amber-100">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="font-semibold text-amber-200">Skipped rows</div>
+                    <button
+                      type="button"
+                      onClick={downloadSkippedRowsCsv}
+                      className="rounded-md border border-amber-400/40 bg-amber-400/10 px-3 py-1.5 text-xs font-medium text-amber-100 hover:bg-amber-400/20"
+                    >
+                      Download CSV
+                    </button>
+                  </div>
+                  <div className="mt-3 max-h-72 space-y-2 overflow-auto pr-1 text-xs">
+                    {result.skippedRows.map((item) => (
+                      <div
+                        key={`${item.rowNumber}-${item.reason}`}
+                        className="rounded-md border border-amber-400/20 bg-black/10 p-3"
+                      >
+                        <div className="font-medium">Row {item.rowNumber}</div>
+                        <div className="mt-1 text-amber-100/90">{item.reason}</div>
+                        {item.row && (
+                          <pre className="mt-2 overflow-x-auto whitespace-pre-wrap break-words text-[11px] text-amber-50/80">
+                            {JSON.stringify(item.row, null, 2)}
+                          </pre>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
