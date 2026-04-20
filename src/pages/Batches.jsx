@@ -243,12 +243,20 @@ function Batches() {
                       )}
 
                       {batch.status === "RELEASED" && (
-                        <button
-                          onClick={() => handleRevokeBatch(batch.id)}
-                          className="px-3 py-1.5 text-sm text-red-300 hover:text-red-200 bg-red-500/10 hover:bg-red-500/20 rounded-lg transition-all"
-                        >
-                          Revoke Batch
-                        </button>
+                        <>
+                          <button
+                            onClick={() => handleRevokeBatch(batch.id)}
+                            className="px-3 py-1.5 text-sm text-red-300 hover:text-red-200 bg-red-500/10 hover:bg-red-500/20 rounded-lg transition-all"
+                          >
+                            Revoke Batch
+                          </button>
+                          <button
+                            onClick={() => handleDelete(batch.id)}
+                            className="px-3 py-1.5 text-sm text-red-300 hover:text-red-200 bg-red-500/10 hover:bg-red-500/20 rounded-lg transition-all"
+                          >
+                            Delete Batch
+                          </button>
+                        </>
                       )}
                     </div>
                   </div>
