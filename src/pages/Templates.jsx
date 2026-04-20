@@ -232,6 +232,8 @@ function Templates() {
         key: obj.data?.key || "field",
         x: Number((centerPoint.x || 0).toFixed(2)),
         y: Number((centerPoint.y || 0).toFixed(2)),
+        centerX: Number((centerPoint.x || 0).toFixed(2)),
+        centerY: Number((centerPoint.y || 0).toFixed(2)),
         originX: "center",
         originY: "center",
         fontSize: obj.fontSize || 24,
@@ -319,14 +321,16 @@ function Templates() {
     const fieldsList = config.fields || [];
 
     for (const field of fieldsList) {
+      const centerX = Number(field.centerX ?? field.x ?? configWidth / 2);
+      const centerY = Number(field.centerY ?? field.y ?? configHeight / 2);
       const text = new Textbox(`{{${field.key}}}`, {
-        left: field.x || configWidth / 2,
-        top: field.y || configHeight / 2,
+        left: centerX,
+        top: centerY,
         fontSize: field.fontSize || 24,
         fill: field.fontColor || "#000000",
         fontFamily: "Rubik",
-        originX: field.originX || "center",
-        originY: field.originY || "center",
+        originX: "center",
+        originY: "center",
         editable: false,
         data: { key: field.key },
       });
