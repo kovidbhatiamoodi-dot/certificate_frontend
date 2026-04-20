@@ -94,6 +94,39 @@ function Batches() {
     }
   };
 
+  const handleRevokeCertificate = async (entryId) => {
+    if (!confirm("Revoke this certificate only? The participant's other certificates will remain available.")) return;
+
+    try {
+      await axios.patch(withId(API_ENDPOINTS.CERTIFICATES_REVOKE, entryId));
+      if (expandedBatch) {
+        const res = await axios.get(withId(API_ENDPOINTS.BATCHES, expandedBatch));
+        setBatchEntries(res.data.entries || []);
+      }
+      fetchBatches();
+    } catch (err) {
+      alert(err.response?.data?.message || "Revoke failed");
+    }
+  };
+
+  const handleRevokeBatch = async (batchId) => {
+    if (!confirm("Revoke all certificates in this batch? This will hide them from users.")) return;
+
+    try {
+      const res = await axios.patch(withId(API_ENDPOINTS.CERTIFICATES_REVOKE_BATCH, batchId));
+      alert(`${res.data.message}\nRevoked: ${res.data.revokedCount}`);
+
+      if (expandedBatch === batchId) {
+        const detail = await axios.get(withId(API_ENDPOINTS.BATCHES, batchId));
+        setBatchEntries(detail.data.entries || []);
+      }
+
+      fetchBatches();
+    } catch (err) {
+      alert(err.response?.data?.message || "Batch revoke failed");
+    }
+  };
+
   const handleDelete = async (batchId) => {
     if (!confirm("Delete this batch? This action cannot be undone.")) return;
     try {
@@ -208,6 +241,15 @@ function Batches() {
                           </button>
                         </>
                       )}
+
+                      {batch.status === "RELEASED" && (
+                        <button
+                          onClick={() => handleRevokeBatch(batch.id)}
+                          className="px-3 py-1.5 text-sm text-red-300 hover:text-red-200 bg-red-500/10 hover:bg-red-500/20 rounded-lg transition-all"
+                        >
+                          Revoke Batch
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -254,12 +296,26 @@ function Batches() {
                                   ))}
                                   {batch.status === "RELEASED" && (
                                     <td className="py-2 px-3">
-                                      <button
-                                        onClick={() => handleDownloadCertificate(entry.id, entry.mi_no)}
-                                        className="text-emerald-400 hover:text-emerald-300 text-xs"
-                                      >
-                                        📄 Download
-                                      </button>
+                                      <div className="flex items-center gap-3">
+                                        {entry.revoked_at ? (
+                                          <span className="text-xs text-red-300">Revoked</span>
+                                        ) : (
+                                          <>
+                                            <button
+                                              onClick={() => handleDownloadCertificate(entry.id, entry.mi_no)}
+                                              className="text-emerald-400 hover:text-emerald-300 text-xs"
+                                            >
+                                              📄 Download
+                                            </button>
+                                            <button
+                                              onClick={() => handleRevokeCertificate(entry.id)}
+                                              className="text-red-400 hover:text-red-300 text-xs"
+                                            >
+                                              Revoke
+                                            </button>
+                                          </>
+                                        )}
+                                      </div>
                                     </td>
                                   )}
                                 </tr>
