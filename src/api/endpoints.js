@@ -12,6 +12,7 @@ export const API_ENDPOINTS = {
   CERTIFICATES_PREVIEW: getEnv("VITE_API_CERTIFICATES_PREVIEW", "/certificates/preview"),
   CERTIFICATES_RELEASE: getEnv("VITE_API_CERTIFICATES_RELEASE", "/certificates/release"),
   CERTIFICATES_REVOKE_BATCH: getEnv("VITE_API_CERTIFICATES_REVOKE_BATCH", "/certificates/revoke-batch"),
+  CERTIFICATES_DOWNLOAD_BATCH: getEnv("VITE_API_CERTIFICATES_DOWNLOAD_BATCH", "/certificates/download-batch"),
   CERTIFICATES_DOWNLOAD: getEnv("VITE_API_CERTIFICATES_DOWNLOAD", "/certificates/download"),
   CERTIFICATES_REVOKE: getEnv("VITE_API_CERTIFICATES_REVOKE", "/certificates/revoke"),
   IDENTITY_MAPPING_UPLOAD: getEnv("VITE_API_IDENTITY_MAPPING_UPLOAD", "/identity-mapping/upload"),
