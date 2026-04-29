@@ -118,6 +118,29 @@ function Batches() {
     }
   };
 
+  const handleDownloadDraftBatchCertificates = async (batch) => {
+    try {
+      setDownloadingBatch(batch.id);
+      const res = await axios.get(withId(API_ENDPOINTS.CERTIFICATES_DOWNLOAD_BATCH_DRAFT, batch.id), {
+        responseType: "blob",
+      });
+
+      const blobUrl = window.URL.createObjectURL(new Blob([res.data], { type: "application/pdf" }));
+      const link = document.createElement("a");
+      const safeBatchName = String(batch.name || "batch").replace(/[^a-zA-Z0-9_-]/g, "_");
+      link.href = blobUrl;
+      link.download = `batch_${safeBatchName}_${batch.id}_draft_certificates.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(blobUrl);
+    } catch (err) {
+      alert(err.response?.data?.message || "Batch download failed");
+    } finally {
+      setDownloadingBatch(null);
+    }
+  };
+
   const handleRevokeCertificate = async (entryId) => {
     if (!confirm("Revoke this certificate only? The participant's other certificates will remain available.")) return;
 
@@ -259,6 +282,13 @@ function Batches() {
                       )}
                       {batch.status === "DRAFT" && (
                         <>
+                          <button
+                            onClick={() => handleDownloadDraftBatchCertificates(batch)}
+                            disabled={downloadingBatch === batch.id}
+                            className="px-3 py-1.5 text-sm text-sky-300 hover:text-sky-200 bg-sky-500/10 hover:bg-sky-500/20 rounded-lg transition-all disabled:opacity-50"
+                          >
+                            {downloadingBatch === batch.id ? "Downloading..." : "⬇ Download Draft"}
+                          </button>
                           <button
                             onClick={() => handleRelease(batch.id)}
                             disabled={releasing === batch.id}
