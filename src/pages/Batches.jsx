@@ -445,7 +445,8 @@ function Batches() {
                         lineHeight: 1,
                         fontSize: field.fontSize || 24,
                         color: field.fontColor || "#000",
-                        fontFamily: "Rubik",
+                        fontFamily: "Helvetica, Arial, sans-serif",
+                        fontWeight: 700,
                         transform:
                           (field.originX || "center") === "center" &&
                           (field.originY || "center") === "center"
