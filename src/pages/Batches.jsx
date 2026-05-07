@@ -16,7 +16,6 @@ function Batches() {
   const [batchEntries, setBatchEntries] = useState([]);
   const [previewData, setPreviewData] = useState(null);
   const [releasing, setReleasing] = useState(null);
-  const [downloadingBatch, setDownloadingBatch] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -92,52 +91,6 @@ function Batches() {
       window.URL.revokeObjectURL(blobUrl);
     } catch (err) {
       alert(err.response?.data?.message || "Download failed");
-    }
-  };
-
-  const handleDownloadBatchCertificates = async (batch) => {
-    try {
-      setDownloadingBatch(batch.id);
-      const res = await axios.get(withId(API_ENDPOINTS.CERTIFICATES_DOWNLOAD_BATCH, batch.id), {
-        responseType: "blob",
-      });
-
-      const blobUrl = window.URL.createObjectURL(new Blob([res.data], { type: "application/pdf" }));
-      const link = document.createElement("a");
-      const safeBatchName = String(batch.name || "batch").replace(/[^a-zA-Z0-9_-]/g, "_");
-      link.href = blobUrl;
-      link.download = `batch_${safeBatchName}_${batch.id}_certificates.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(blobUrl);
-    } catch (err) {
-      alert(err.response?.data?.message || "Batch download failed");
-    } finally {
-      setDownloadingBatch(null);
-    }
-  };
-
-  const handleDownloadDraftBatchCertificates = async (batch) => {
-    try {
-      setDownloadingBatch(batch.id);
-      const res = await axios.get(withId(API_ENDPOINTS.CERTIFICATES_DOWNLOAD_BATCH_DRAFT, batch.id), {
-        responseType: "blob",
-      });
-
-      const blobUrl = window.URL.createObjectURL(new Blob([res.data], { type: "application/pdf" }));
-      const link = document.createElement("a");
-      const safeBatchName = String(batch.name || "batch").replace(/[^a-zA-Z0-9_-]/g, "_");
-      link.href = blobUrl;
-      link.download = `batch_${safeBatchName}_${batch.id}_draft_certificates.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(blobUrl);
-    } catch (err) {
-      alert(err.response?.data?.message || "Batch download failed");
-    } finally {
-      setDownloadingBatch(null);
     }
   };
 
@@ -271,24 +224,8 @@ function Batches() {
                       >
                         Preview
                       </button>
-                      {batch.status === "RELEASED" && (
-                        <button
-                          onClick={() => handleDownloadBatchCertificates(batch)}
-                          disabled={downloadingBatch === batch.id}
-                          className="px-3 py-1.5 text-sm text-sky-300 hover:text-sky-200 bg-sky-500/10 hover:bg-sky-500/20 rounded-lg transition-all disabled:opacity-50"
-                        >
-                          {downloadingBatch === batch.id ? "Downloading..." : "⬇ Download All"}
-                        </button>
-                      )}
                       {batch.status === "DRAFT" && (
                         <>
-                          <button
-                            onClick={() => handleDownloadDraftBatchCertificates(batch)}
-                            disabled={downloadingBatch === batch.id}
-                            className="px-3 py-1.5 text-sm text-sky-300 hover:text-sky-200 bg-sky-500/10 hover:bg-sky-500/20 rounded-lg transition-all disabled:opacity-50"
-                          >
-                            {downloadingBatch === batch.id ? "Downloading..." : "⬇ Download Draft"}
-                          </button>
                           <button
                             onClick={() => handleRelease(batch.id)}
                             disabled={releasing === batch.id}
@@ -445,8 +382,8 @@ function Batches() {
                         lineHeight: 1,
                         fontSize: field.fontSize || 24,
                         color: field.fontColor || "#000",
-                        fontFamily: "Helvetica, Arial, sans-serif",
-                        fontWeight: 700,
+                        fontFamily: "Rubik",
+                        fontWeight: 500,
                         transform:
                           (field.originX || "center") === "center" &&
                           (field.originY || "center") === "center"
